@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((post) => ({
+		params: { post: post.id.replace(/\.(md|mdx)$/i, '') },
+	}));
+}
+
+const { post } = Astro.params;
+const posts = await getCollection('blog');
+const currentPost = posts.find((entry) => entry.id.replace(/\.(md|mdx)$/i, '') === post);
+
+if (!currentPost) {
+	throw new Error(`Post not found: ${post}`);
+}
+
+const { Content } = await render(currentPost);
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={currentPost.data.title} description={currentPost.data.description} />
+	</head>
+	<body>
+		<main class="page-shell">
+			<nav class="topbar">
+				<a href="/" class="brand">Back home</a>
+			</nav>
+
+			<article>
+				<p class="eyebrow">Blog post</p>
+				<h1>{currentPost.data.title}</h1>
+				<p class="lede">{currentPost.data.description}</p>
+				<Content />
+			</article>
+		</main>
+	</body>
+</html>
