@@ -1,6 +1,3 @@
-# agent skills and personas
-.agents/
-
 # build output
 dist/
 # generated types
